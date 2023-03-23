@@ -16,7 +16,7 @@ def quicksort(words):
             right.append(word)
     return quicksort(left) + [pivot] + quicksort(right)
 
-def restaurant_dict(list):
+def order_restaurants(list):
     rdict = {}
     for restaurant in list:
         if restaurant[0] not in rdict.keys():
@@ -25,36 +25,61 @@ def restaurant_dict(list):
         rdict[restaurant[0]] += [restaurant[1:]]
     return rdict
 
+# sort and order types and restaurants
+def prepare_types_and_restaurants(types, restaurants):
+    sorted_types = quicksort(types)
+    restaurant_dict = order_restaurants(restaurants)
+    return sorted_types, restaurant_dict
+
 # Print function
 def print_restaurants(list):
-    pass
+    for restaurant in list:
+        print("************************************************************", end="\n\n")
+        print(f"Name: {restaurant[0]}")
+        print(f"Price: {restaurant[1]}/5")
+        print(f"Price: {restaurant[2]}/5")
+        print(f"Address: {restaurant[3]}")
+    print("************************************************************", end="\n\n")
+
+def print_types(types):
+    printable_types = ""
+    for type in types:
+        printable_types += type + "  "
+    return printable_types
 
 # recommender function
 def recommender():
-    pass
+    sorted_types, restaurant_dict = prepare_types_and_restaurants(types, restaurant_data)
+    letters = input("What type of food would you like? Enter one or more letters: ").strip().lower()
+    choices = autocomplete(letters, sorted_types)
+    if choices == []:
+        print(f"No food type that starts with {letters}\n")
+        print("Please choose from these food types: " + print_types(sorted_types) + "\n")
+        recommender()
+    else:
+        if len(choices) == 1:
+            choice = choices[0]
+            print(f"Your only choice for your input is: {choice}\n")
+            confirmation = input(f"Would you like to view {choice} restaurants? y/n: ").strip().lower()
+            if confirmation == "y":
+                print_restaurants(restaurant_dict[choice])
+        else:
+            print("You have multiple choices: " + print_types(choices))
+            choice = input("Which one would you like? Enter name: ").strip().lower()
+            if choice in choices:
+                confirmation = input(f"Would you like to view {choice} restaurants? y/n: ").strip().lower()
+                if confirmation == "y":
+                    print_restaurants(restaurant_dict[choice])
+            else:
+                print("This food type was not listed.\n\n")
+    confirmation = input("Would you like to search again? y/n: ").strip().lower()
+    if confirmation == "y":
+        print("\n")
+        recommender()
+    else:
+        print("Thank you for using this service.\n\n")
+        quit()
+    
 
-
-
-rd = restaurant_dict(restaurant_data)
-print(rd["german"][0])
-
-
-
-
-
-
-
-
-# JUST FOR TEST
-
-
-"""
-words = ['apple', 'banana', 'orange', 'peach', 'pear']
-print(autocomplete('a', words)) # ['apple']
-print(autocomplete('pe', words)) # ['peach', 'pear']
-
-words = ['pear', 'banana', 'apple', 'orange', 'peach']
-sorted_words = quicksort(types)
-print(sorted_words) # ['apple', 'banana', 'orange', 'peach', 'pear']
-
-"""
+print("\nRESTAURANT RECOMMENDER SYSTEM\n")
+recommender()
